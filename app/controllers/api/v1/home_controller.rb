@@ -1,4 +1,4 @@
-class HomeController < ApplicationController
+class Api::V1::HomeController < ApplicationController
 
   def index
     if user_signed_in?
