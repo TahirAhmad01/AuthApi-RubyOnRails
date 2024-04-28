@@ -7,23 +7,19 @@ class Users::SessionsController < Devise::SessionsController
 
   def respond_with(resource, _opts = {})
     if resource.persisted?
-      if user_signed_in?
-        render json: {
-          code:200,
-          message: "User is already signed in",
-          data: current_user
-        }, status: :ok
-      else
-        render json: {
-          code:200,
-          message: "User Signed in Successfully",
-          data: current_user
-        }, status: :ok
-      end
+      render json: {
+        code: 200,
+        message: "User is already signed in",
+        data: current_user
+      }, status: :ok
     else
+      errors_array = resource.errors.messages.map do |attribute, messages|
+        { name: attribute, errors: messages }
+      end
+
       render json: {
         message: resource.errors.full_messages.to_sentence,
-        data: resource
+        errors: errors_array
       }, status: :unprocessable_entity
     end
   end

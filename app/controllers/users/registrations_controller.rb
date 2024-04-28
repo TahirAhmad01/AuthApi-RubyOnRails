@@ -16,8 +16,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
           code: 200, message: "User registration was successfully registered", data: resource
         }, status: :ok
       else
+        errors_array = resource.errors.messages.map do |attribute, messages|
+          { name: attribute, errors: messages }
+        end
         render json: {
-          message: "User registration failed", data: resource.errors.full_messages
+          message: "User registration failed", errors: errors_array
         }, status: :unprocessable_entity
       end
     end

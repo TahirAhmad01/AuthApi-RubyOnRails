@@ -1,5 +1,5 @@
 class Api::V1::CompaniesController < ApiController
-  before_action :set_company, only: [:show]
+  before_action :set_company, only: [:show, :update, :destroy]
 
   def index
     @companies = current_user.companies
@@ -7,17 +7,35 @@ class Api::V1::CompaniesController < ApiController
   end
 
   def show
-
-
     render json: @company, status: :ok
   end
 
   def create
     @company = current_user.companies.new(company_params)
     if @company.save
-      render json: @company, status: :created
+      render json: { message: "Company created successfully", data: @company, status: 200 }, status: :created
+    else
+      errors_array = @company.errors.messages.map do |attribute, messages|
+        { name: attribute, errors: messages }
+      end
+      render json: { errors: errors_array, status: :unprocessable_entity }
+    end
+  end
+
+  def update
+    if @company.update(company_params)
+      render json: { message: "Companies updated successfully", data: @company, status:
+        200 }, status: :ok
     else
       render json: @company.errors, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @company.destroy
+      render json: { message: "Company deleted successfully", status: 200 }, status: :ok
+    else
+      render json: { message: "something went wrong", status: "failed" }, status: :unprocessable_entity
     end
   end
 
