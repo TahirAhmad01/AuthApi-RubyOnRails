@@ -32,10 +32,14 @@ class Api::V1::CompaniesController < ApiController
   end
 
   def destroy
-    if @company.destroy
-      render json: { message: "Company deleted successfully", status: 200 }, status: :ok
+    if @company.exists?
+      if @company.destroy
+        render json: { message: "Company deleted successfully", status: 200 }, status: :ok
+      else
+        render json: { message: "something went wrong", status: "failed" }, status: :unprocessable_entity
+      end
     else
-      render json: { message: "something went wrong", status: "failed" }, status: :unprocessable_entity
+      render json: { message: "Company not found", status: "failed" }, status: :not_found
     end
   end
 
