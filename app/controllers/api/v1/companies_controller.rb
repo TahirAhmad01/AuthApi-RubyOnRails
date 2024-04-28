@@ -2,7 +2,8 @@ class Api::V1::CompaniesController < ApiController
   before_action :set_company, only: [:show, :update, :destroy]
 
   def index
-    @companies = current_user.companies
+    @companies = Company.all
+    # @companies = current_user.companies
     render json: @companies, status: :ok
   end
 
