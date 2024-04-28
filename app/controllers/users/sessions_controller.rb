@@ -9,7 +9,7 @@ class Users::SessionsController < Devise::SessionsController
     if resource.persisted?
       render json: {
         code: 200,
-        message: "User is already signed in",
+        message: "User signed in successfully",
         data: current_user
       }, status: :ok
     else

@@ -13,7 +13,8 @@ class Api::V1::CompaniesController < ApiController
   end
 
   def create
-    @company = current_user.companies.new(company_params)
+    @company = Company.new(company_params)
+    # @company = current_user.companies.new(company_params)
     if @company.save
       render json: { message: "Company created successfully", data: @company, status: 200 }, status: :created
     else
@@ -34,7 +35,7 @@ class Api::V1::CompaniesController < ApiController
   end
 
   def destroy
-    if @company.exists?
+    if @company
       if @company.destroy
         render json: { message: "Company deleted successfully", status: 200 }, status: :ok
       else
@@ -49,7 +50,8 @@ class Api::V1::CompaniesController < ApiController
 
   def set_company
     puts "Current User: #{current_user.inspect}"
-    @company = current_user.companies.find(params[:id])
+    @company = Company.find(params[:id])
+    # @company = current_user.companies.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Company not found" }, status: :not_found
   end

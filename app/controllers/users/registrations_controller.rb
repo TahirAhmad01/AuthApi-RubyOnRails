@@ -6,11 +6,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
   private
 
   def respond_with (resource, options = {})
-    if current_user
-      render json: { error: "User Already Signed In. Please log out before proceeding with registration.",
-                     data: current_user,
-                     status: 200 }, status: :ok
-    else
+    # if current_user
+    #   render json: { error: "User Already Signed In. Please log out before proceeding with registration.",
+    #                  data: current_user,
+    #                  status: 200 }, status: :ok
+    # else
       if resource.persisted?
         render json: {
           code: 200, message: "User registration was successfully registered", data: resource
@@ -25,5 +25,5 @@ class Users::RegistrationsController < Devise::RegistrationsController
       end
     end
 
-  end
+  # end
 end
