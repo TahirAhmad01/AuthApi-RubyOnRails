@@ -1,10 +1,14 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: {
-    sessions: "users/sessions",
-    registrations: "users/registrations",
-  }
+  scope :api, defaults: { format: :json } do
+    scope :v1 do
+      devise_for :users, controllers: {
+        sessions: "users/sessions",
+        registrations: "users/registrations",
+      }
+    end
+  end
 
-  namespace :api do
+  namespace :api, defaults: {format: :json } do
     namespace :v1 do
       resources :companies
       root to: "home#index", as: "api_home"
