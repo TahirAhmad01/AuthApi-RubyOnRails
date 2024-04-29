@@ -1,4 +1,4 @@
-class Users::RegistrationsController < Devise::RegistrationsController
+class RegistrationsController < Devise::RegistrationsController
   respond_to :json
 
   def create
@@ -25,7 +25,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
         { name: attribute, errors: messages }
       end
       render json: {
-        message: "User registration failed", errors: errors_array
+        error: "User registration failed", error_messages: errors_array
       }, status: :unprocessable_entity
     end
   end

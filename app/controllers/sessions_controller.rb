@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Users::SessionsController < Devise::SessionsController
+class SessionsController < Devise::SessionsController
   respond_to :json
 
   private
@@ -18,8 +18,8 @@ class Users::SessionsController < Devise::SessionsController
       end
 
       render json: {
-        message: resource.errors.full_messages.to_sentence,
-        errors: errors_array
+        error: resource.errors.full_messages.to_sentence,
+        error_messages: errors_array
       }, status: :unprocessable_entity
     end
   end
@@ -32,23 +32,24 @@ class Users::SessionsController < Devise::SessionsController
         current_user = User.find(jwt_payload["sub"])
         render json: {
           status: 200,
-          message: "User Signed out Successfully"
+          message: "User Signed out Successfully",
+          data: current_user
         }, status: :ok
       rescue JWT::DecodeError => e
         render json: {
           status: 401,
-          message: "Invalid JWT token: #{e.message}"
+          error: "Invalid JWT token: #{e.message}"
         }, status: :unauthorized
       rescue ActiveRecord::RecordNotFound => e
         render json: {
           status: 404,
-          message: "User not found"
+          error: "User not found"
         }, status: :not_found
       end
     else
       render json: {
         status: 401,
-        message: "Authorization header missing"
+        error: "Authorization header missing"
       }, status: :unauthorized
     end
   end

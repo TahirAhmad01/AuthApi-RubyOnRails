@@ -1,9 +1,8 @@
 class Api::V1::CompaniesController < ApiController
-  load_and_authorize_resource
   before_action :set_company, only: [:show, :update, :destroy]
 
   def index
-    @companies = Company.all
+    @companies = Company.accessible_by(current_ability)
     # @companies = current_user.companies
     render json: @companies, status: :ok
   end
@@ -27,10 +26,10 @@ class Api::V1::CompaniesController < ApiController
 
   def update
     if @company.update(company_params)
-      render json: { message: "Companies updated successfully", data: @company, status:
+      render json: { message: "Company updated successfully", data: @company, status:
         200 }, status: :ok
     else
-      render json: @company.errors, status: :unprocessable_entity
+      render json: { error: "Company update failed", error_messages: @company.errors, status: 422 }, status: :unprocessable_entity
     end
   end
 
@@ -39,10 +38,10 @@ class Api::V1::CompaniesController < ApiController
       if @company.destroy
         render json: { message: "Company deleted successfully", status: 200 }, status: :ok
       else
-        render json: { message: "something went wrong", status: "failed" }, status: :unprocessable_entity
+        render json: { error: "something went wrong", status: "failed" }, status: :unprocessable_entity
       end
     else
-      render json: { message: "Company not found", status: "failed" }, status: :not_found
+      render json: { error: "Company not found", status: "failed" }, status: :not_found
     end
   end
 

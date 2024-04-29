@@ -7,7 +7,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
 
-  ROLES = %w{super_admin admin manager editor collaborator}
+  ROLES = %w{super_admin admin user}
   validates :role, inclusion: { in: ROLES }
   # validate :password_confirmation_match, on: :create
 
