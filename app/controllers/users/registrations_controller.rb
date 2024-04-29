@@ -17,8 +17,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
         }, status: :ok
       else
         errors_array = resource.errors.messages.map do |attribute, messages|
-          { name: attribute, errors: messages }
+          { name: attribute, errors: messages.map { |error| "#{attribute} #{error}" } }
         end
+
         render json: {
           message: "User registration failed", errors: errors_array
         }, status: :unprocessable_entity

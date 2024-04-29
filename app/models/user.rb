@@ -8,6 +8,8 @@ class User < ApplicationRecord
          :jwt_authenticatable, jwt_revocation_strategy: self
 
   ROLES = %w{super_admin admin manager editor collaborator}
+  validates :role, inclusion: { in: ROLES }
+  # validate :password_confirmation_match, on: :create
 
   def jwt_payload
     super
@@ -19,5 +21,9 @@ class User < ApplicationRecord
     end
   end
 
+  private
 
+  # def password_confirmation_match
+  #   errors.add(:password_confirmation, "doesn't match Password") if password != password_confirmation
+  # end
 end
