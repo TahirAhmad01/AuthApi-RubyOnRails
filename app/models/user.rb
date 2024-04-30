@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  include Devise::JWT::RevocationStrategies::JTIMatcher
+  include Devise::JWT::RevocationStrategies::Allowlist
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
@@ -20,6 +20,14 @@ class User < ApplicationRecord
     define_method "#{role_name}?" do
       role == role_name
     end
+    end
+
+  def self.jwt_revoked?(payload, user)
+    token = user.jwt_allowlists.where(jti: payload['jti'], aud: payload['aud']).order(created_at: :desc).first
+    return true if token.blank?
+
+    token.update(exp: Time.current + 2.minutes.to_i)
+    false
   end
 
   private
@@ -27,4 +35,6 @@ class User < ApplicationRecord
   def set_user_role
     self.role ||= 'user'
   end
+
+
 end

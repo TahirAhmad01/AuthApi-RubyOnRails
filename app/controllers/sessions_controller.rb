@@ -3,6 +3,19 @@
 class SessionsController < Devise::SessionsController
   respond_to :json
 
+  #   def refresh_token
+  #     token = request.headers['Authorization'].split(' ').last
+  #     payload = JWT.decode(token, ENV['DEVISE_JWT_SECRET_KEY'], true, algorithm: 'HS256').first
+  #     user = User.find(payload['sub'])
+  #
+  #     if user
+  #       render json: { token: TokenService.generate_token(user) }
+  #     else
+  #       render json: { error: 'Invalid token' }, status: :unauthorized
+  #     end
+  #   end
+  # end
+
   private
 
   def respond_with(resource, _opts = {})
@@ -30,11 +43,20 @@ class SessionsController < Devise::SessionsController
       begin
         jwt_payload = JWT.decode(token, ENV['JWT_SECRET_KEY']).first
         current_user = User.find(jwt_payload["sub"])
-        render json: {
-          status: 200,
-          message: "User Signed out Successfully",
-          data: current_user
-        }, status: :ok
+
+        # Sign out logic
+        sign_out(current_user) # Assuming you're using Devise for authentication
+
+        # Clear session
+        reset_session
+        if jwt_payload
+          render json: {
+            code: 200,
+            message: "User signed out successfully"
+          }, status: :ok
+        end
+
+
       rescue JWT::DecodeError => e
         render json: {
           status: 401,

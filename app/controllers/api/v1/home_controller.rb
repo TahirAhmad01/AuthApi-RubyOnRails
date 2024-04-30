@@ -1,5 +1,4 @@
-class Api::V1::HomeController < ApiController
-
+class Api::V1::HomeController < ApplicationController
   def index
     if user_signed_in?
       render json: {

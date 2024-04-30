@@ -5,10 +5,14 @@ Rails.application.routes.draw do
         sessions: "sessions",
         registrations: "registrations",
       }
+
+      # devise_scope :user do
+      #   post '/refresh_token', to: 'sessions#refresh_token'
+      # end
     end
   end
 
-  namespace :api, defaults: {format: :json } do
+  namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :companies
       root to: "home#index", as: "api_home"
