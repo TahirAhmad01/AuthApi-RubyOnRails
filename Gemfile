@@ -49,3 +49,4 @@ end
 
 gem "devise"
 gem "devise-jwt"
+gem "dotenv", "~> 3.1"

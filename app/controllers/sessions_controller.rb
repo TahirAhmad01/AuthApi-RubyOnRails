@@ -28,7 +28,7 @@ class SessionsController < Devise::SessionsController
     if request.headers["Authorization"].present?
       token = request.headers["Authorization"].split(" ").last
       begin
-        jwt_payload = JWT.decode(token, Rails.application.credentials.fetch(:secret_key_base)).first
+        jwt_payload = JWT.decode(token, ENV['JWT_SECRET_KEY']).first
         current_user = User.find(jwt_payload["sub"])
         render json: {
           status: 200,
