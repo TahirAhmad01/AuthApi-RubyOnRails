@@ -6,9 +6,9 @@ Rails.application.routes.draw do
         registrations: "registrations",
       }
 
-      # devise_scope :user do
-      #   post '/refresh_token', to: 'sessions#refresh_token'
-      # end
+      devise_scope :user do
+        post '/users/refresh_token', to: 'sessions#refresh' # Adjusted route
+      end
     end
   end
 

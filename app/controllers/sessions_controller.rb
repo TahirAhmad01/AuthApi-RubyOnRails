@@ -3,18 +3,24 @@
 class SessionsController < Devise::SessionsController
   respond_to :json
 
-  #   def refresh_token
-  #     token = request.headers['Authorization'].split(' ').last
-  #     payload = JWT.decode(token, ENV['DEVISE_JWT_SECRET_KEY'], true, algorithm: 'HS256').first
-  #     user = User.find(payload['sub'])
-  #
-  #     if user
-  #       render json: { token: TokenService.generate_token(user) }
-  #     else
-  #       render json: { error: 'Invalid token' }, status: :unauthorized
-  #     end
-  #   end
-  # end
+  include Jwt::Refresher
+
+  def create
+    super do |resource|
+      access_token, refresh_token = Jwt::Issuer.call(resource)
+      response.headers['access-token'] = access_token
+      response.headers['refresh-token'] = refresh_token.crypted_token # Adjusted to use crypted_token
+    end
+  end
+
+  def refresh
+    refresh_token = request.headers['refresh-token']
+    access_token, new_refresh_token = refresh!(refresh_token: refresh_token, decoded_token: nil, user: current_user)
+    response.headers['access-token'] = access_token
+    response.headers['refresh-token'] = new_refresh_token.token
+    head :ok
+  end
+
 
   private
 

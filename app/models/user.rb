@@ -6,6 +6,8 @@ class User < ApplicationRecord
          :jwt_authenticatable, jwt_revocation_strategy: self
 
   before_validation :set_user_role, on: :create
+  has_many :refresh_tokens, dependent: :destroy
+  has_many :whitelisted_tokens, dependent: :destroy
   has_many :companies
 
   ROLES = %w(super_admin admin user)
