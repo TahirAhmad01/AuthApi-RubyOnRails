@@ -3,66 +3,38 @@
 class SessionsController < Devise::SessionsController
   respond_to :json
 
-  include Jwt::Refresher
-
   def create
-    super do |resource|
-      access_token, refresh_token = Jwt::Issuer.call(resource)
-      response.headers['access-token'] = access_token
-      response.headers['refresh-token'] = refresh_token.crypted_token # Adjusted to use crypted_token
+    super do |user|
+      if user.persisted?
+        token = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil)
+        render json: { message: "User signed in successfully", user: user, token: token }, status: :ok
+        return
+      else
+        render json: { message: user.errors.full_messages }, status: :unprocessable_entity
+      end
     end
   end
 
   def refresh
-    refresh_token = request.headers['refresh-token']
-    access_token, new_refresh_token = refresh!(refresh_token: refresh_token, decoded_token: nil, user: current_user)
-    response.headers['access-token'] = access_token
-    response.headers['refresh-token'] = new_refresh_token.token
-    head :ok
-  end
-
-
-  private
-
-  def respond_with(resource, _opts = {})
-    if resource.persisted?
-      render json: {
-        code: 200,
-        message: "User signed in successfully",
-        data: current_user
-      }, status: :ok
-    else
-      errors_array = resource.errors.messages.map do |attribute, messages|
-        { name: attribute, errors: messages }
-      end
-
-      render json: {
-        error: resource.errors.full_messages.to_sentence,
-        error_messages: errors_array
-      }, status: :unprocessable_entity
+    if current_user
+      token = Warden::JWTAuth::UserEncoder.new.call(current_user, :user, nil)
+      render json: { user: current_user, token: token }, status: :ok
     end
   end
 
-  def respond_to_on_destroy
+  def destroy
     if request.headers["Authorization"].present?
       token = request.headers["Authorization"].split(" ").last
       begin
         jwt_payload = JWT.decode(token, ENV['JWT_SECRET_KEY']).first
-        current_user = User.find(jwt_payload["sub"])
-
-        # Sign out logic
-        sign_out(current_user) # Assuming you're using Devise for authentication
-
-        # Clear session
-        reset_session
+        # current_user = User.find(jwt_payload["sub"])
         if jwt_payload
+          super
           render json: {
             code: 200,
             message: "User signed out successfully"
           }, status: :ok
         end
-
-
       rescue JWT::DecodeError => e
         render json: {
           status: 401,
@@ -80,5 +52,10 @@ class SessionsController < Devise::SessionsController
         error: "Authorization header missing"
       }, status: :unauthorized
     end
+  end
+
+  private
+
+  def respond_to_on_destroy
   end
 end
