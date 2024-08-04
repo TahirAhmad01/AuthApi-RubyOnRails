@@ -1,23 +1,19 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### Project Setup
+- Clone the project:
 
-Things you may want to cover:
+        git clone https://github.com/TahirAhmad01/AuthApi-RubyOnRails
+        cd AuthApi-RubyOnRails
 
-* Ruby version - 3.1.4
+- Install dependencies:
 
-* System dependencies
+        bundle install
+        yarn install
+        rake db:create
+        rake db:migrate
+        rake db:seed
+        
+- Run the Rails server:
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-* ...
+        rails s
